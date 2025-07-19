@@ -1,8 +1,8 @@
-
+import Weather from "./components/Weather";
 const App=()=>{
   return(
     <div>
-      app
+    <Weather />
     </div>
   )
 }
