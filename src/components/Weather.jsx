@@ -3,13 +3,13 @@ import { CiSearch } from "react-icons/ci";
 import { TiWeatherPartlySunny } from "react-icons/ti";
 import { MdOutlineWaves } from "react-icons/md";
 import { FaWind } from "react-icons/fa";
-import { BiColor } from "react-icons/bi";
 
 const Weather=()=>{
-const [weatherData,setData]=useState([]);
+const [weatherData,setWeatherData]=useState([]);
 const [cityName,setCityName]=useState("London");
 const [inputValue,setInputValue]=useState("");
 const [loading,setLoading]=useState(true);
+const [error,setError]=useState(false);
 
 const handleInput=(e)=>{
 const inputData=e.target.value;
@@ -18,22 +18,41 @@ setCityName(inputData);
 }
 
 const handleSearch=()=>{
-    if(inputValue === "") return;
+    if(inputValue.trim() === "") {
+        return;
+    } else if (!inputValue.includes(weatherData?.name)){
+    setError(true);
+    setWeatherData(null);
+    } else {
+        setError(true);
+    }
     getData();
     setInputValue("");
-    console.log("search");
 }
 
     const getData=async()=>{
         const apiKey=import.meta.env.VITE_API_KEY;
         setLoading(true);
+        setError(false);
         try{
         const response=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`)
         const data=await response.json();
-        setData(data);
+        setWeatherData(data);
         setLoading(false);
+        if(response.ok){
+        setError(false);
+        setLoading(false);
+        setWeatherData(data);
+        } else {
+            setWeatherData(null);
+            setError(true);
+            setLoading(false);
+        }
         console.log(data);
         } catch(error) {
+            setError(error);
+            setLoading(false);
+            setWeatherData(null);
             console.log(error.message);
         }
         }
@@ -43,13 +62,14 @@ const handleSearch=()=>{
         },[]);
 
     return(
-        <div className="h-[500px] w-[450px] bg-blue-300 px-10 py-15 flex flex-col gap-5">
+        <div className="h-[500px] w-[450px] bg-blue-300 px-10 py-10 flex flex-col gap-5">
             <div className="flex justify-between">
-                <input value={inputValue} onChange={handleInput} type="text" className="h-[50px] w-3/4 border-1 rounded-3xl" />
+                <input value={inputValue} onChange={handleInput} type="text" className="h-[50px] w-3/4 px-5 border-1 rounded-3xl" />
                 <div onClick={handleSearch} className="h-[50px] w-[60px] border-1 rounded-full flex items-center justify-center">
                 <CiSearch />
                 </div>
                 </div>
+{error ? <p className="text-red-600 text-center">No City found</p> : ""}
 
 {weatherData && !loading ?
                 <div className="flex flex-col gap-5 text-center">
@@ -57,8 +77,8 @@ const handleSearch=()=>{
                     <div className="flex justify-center">
                 <TiWeatherPartlySunny  className="h-20 w-20 "/>
                 </div>
-                    <h1 className="text-5xl font-bold">{weatherData ?(weatherData?.main?.temp-273.15).toFixed(1):"hjhj" }°C</h1>
-                <h2  className="text-5xl font-bold">{weatherData?.name}</h2>
+                    <h1 className="text-5xl font-bold">{(weatherData?.main?.temp-273.15).toFixed(1) }°C</h1>
+                <h2 className="text-5xl font-bold">{weatherData?.name }</h2>
                 </div>  
                 <div className="flex justify-between">
                 <div className="text-left">
