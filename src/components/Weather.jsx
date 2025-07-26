@@ -18,14 +18,7 @@ setCityName(inputData);
 }
 
 const handleSearch=()=>{
-    if(inputValue.trim() === "") {
-        return;
-    } else if (!inputValue.includes(weatherData?.name)){
-    setError(true);
-    setWeatherData(null);
-    } else {
-        setError(true);
-    }
+    if(inputValue.trim() === "")  return;
     getData();
     setInputValue("");
 }
@@ -44,17 +37,20 @@ const handleSearch=()=>{
         setLoading(false);
         setWeatherData(data);
         } else {
-            setWeatherData(null);
+            setWeatherData(weatherData);
             setError(true);
             setLoading(false);
         }
         console.log(data);
         } catch(error) {
-            setError(error);
+            setError(true);
             setLoading(false);
             setWeatherData(null);
             console.log(error.message);
-        }
+            
+        } finally{
+            setLoading(false);
+        } 
         }
 
         useEffect(()=>{
@@ -69,10 +65,14 @@ const handleSearch=()=>{
                 <CiSearch />
                 </div>
                 </div>
-{error ? <p className="text-red-600 text-center">No City found</p> : ""}
 
-{weatherData && !loading ?
-                <div className="flex flex-col gap-5 text-center">
+{ loading ?
+   (<p className={`h-full w-full flex justify-center items-center text-4xl text-white transition-all ease-out duration-700
+`}>loading....</p> )
+:
+ error ?  (<p className="text-red-600 text-center">City not found</p> && 
+    <div>
+         <div className="flex flex-col gap-5 text-center">
                         <div className="flex flex-col gap-5 pb-5">
                     <div className="flex justify-center">
                 <TiWeatherPartlySunny  className="h-20 w-20 "/>
@@ -83,7 +83,7 @@ const handleSearch=()=>{
                 <div className="flex justify-between">
                 <div className="text-left">
                 <MdOutlineWaves />
-                <p>{weatherData?.main?.humidity}°C</p>
+                <p>{weatherData?.main?.humidity}</p>
                 <p>Humidity</p>
 
                 </div>
@@ -94,10 +94,35 @@ const handleSearch=()=>{
                 </div>
                 </div>
                 </div>
-: <p className={`h-full w-full flex justify-center items-center text-4xl text-white transition-all ease-out duration-700
-${loading ? "translate-y-10" : "translate-y-0"  }
-`}>loading....</p>}
         </div>
-    )
+ )
+:
+weatherData ?
+(                <div className="flex flex-col gap-5 text-center">
+                        <div className="flex flex-col gap-5 pb-5">
+                    <div className="flex justify-center">
+                <TiWeatherPartlySunny  className="h-20 w-20 "/>
+                </div>
+                    <h1 className="text-5xl font-bold">{(weatherData?.main?.temp-273.15).toFixed(1) }°C</h1>
+                <h2 className="text-5xl font-bold">{weatherData?.name }</h2>
+                </div>  
+                <div className="flex justify-between">
+                <div className="text-left">
+                <MdOutlineWaves />
+                <p>{weatherData?.main?.humidity}</p>
+                <p>Humidity</p>
+
+                </div>
+                <div className="text-left">
+                <FaWind />
+<p>{weatherData?.wind?.speed}Km/h</p>
+<p>Wind Speed</p>
+                </div>
+                </div>
+                </div>) : null}
+             
+        </div>
+
+                )
 }
 export default Weather;
