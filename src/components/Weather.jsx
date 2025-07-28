@@ -45,7 +45,7 @@ const handleSearch=()=>{
         } catch(error) {
             setError(true);
             setLoading(false);
-            setWeatherData(null);
+            setWeatherData(weatherData);
             console.log(error.message);
             
         } finally{
@@ -70,8 +70,9 @@ const handleSearch=()=>{
    (<p className={`h-full w-full flex justify-center items-center text-4xl text-white transition-all ease-out duration-700
 `}>loading....</p> )
 :
- error ?  (<p className="text-red-600 text-center">City not found</p> && 
-    <div>
+ error ?
+(<div>
+   <p className="text-red-600 text-center">City not found</p> 
          <div className="flex flex-col gap-5 text-center">
                         <div className="flex flex-col gap-5 pb-5">
                     <div className="flex justify-center">
